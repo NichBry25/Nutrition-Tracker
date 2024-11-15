@@ -15,6 +15,6 @@ if __name__ == "__main__":
                          App.user_data["activity"],
                          App.user_data["fitness"],
                          App.user_data["carbohydrates"],
-                         App.user_data["health"],)
+                         App.user_data["health"])
     
     print(nbhealth)

@@ -6,7 +6,6 @@ class UserInputSignup:
         CTK.set_appearance_mode("dark")
         CTK.set_default_color_theme("blue")
         self.user_data = {}
-        self.create_first_window()
     
     def create_first_window(self):
         self.window1 = CTK.CTk()
@@ -206,4 +205,10 @@ class UserInputSignup:
 
     def save_information(self):
         self.window_confirm.destroy()
+        self.save_window = CTK.CTk()
+        self.save_window.title("Yay! Welcome.")
+        self.save_window.geometry("400x400")
+        CTK.CTkLabel(self.save_window, text="Your data has been saved! Close and restart the app.").pack(pady=5)
         return self.user_data
+
+Application = UserInputSignup()

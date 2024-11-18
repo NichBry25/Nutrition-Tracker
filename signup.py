@@ -211,4 +211,3 @@ class UserInputSignup:
         CTK.CTkLabel(self.save_window, text="Your data has been saved! Close and restart the app.").pack(pady=5)
         return self.user_data
 
-Application = UserInputSignup()

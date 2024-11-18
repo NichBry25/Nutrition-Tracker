@@ -61,3 +61,4 @@ class API_edamame:
         else:
             print(f"Error {response.status_code}, {response.text}")
         return 0
+

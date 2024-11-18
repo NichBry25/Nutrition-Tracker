@@ -1,12 +1,16 @@
 import sqlite3
 import customtkinter as CTK
 from signup import UserInputSignup
+from tkinter import ttk
 from nutritionlimit import nutrition
+from api import API_edamame
 
 class LoginAndSignUp:
     def __init__(self, db_manager) -> None:
         self.db_manager = db_manager
         self.gettingdata = UserInputSignup()
+        # self.fooddatafromAPI = API_edamame() 
+        # Later On
         CTK.set_appearance_mode("dark")
         CTK.set_default_color_theme("blue")
         self.create_entry_window()
@@ -63,7 +67,8 @@ class LoginAndSignUp:
         if user:
             user_id = user[0]
             user_info = self.db_manager.get_user_information(user_id)
-            self.show_main_page(user_info)
+            user_info_fulfilled = self.db_manager.get_user_information_fulfilled(user_id)
+            self.show_main_page(user_info, user_info_fulfilled)
         else:
             CTK.CTkLabel(self.login_window, text = "Invalid username or password.").pack(pady=5)
 
@@ -94,26 +99,52 @@ class LoginAndSignUp:
         self.signup_window.destroy()
         self.create_entry_window
 
-    def show_main_page(self, user_info):
+    def show_main_page(self, user_info, user_info_fulfilled):
         self.login_window.destroy()
 
         self.main_page = CTK.CTk()
-        self.main_page.geometry("600x600")
+        self.main_page.title("Eat healthy!")
+        self.main_page.geometry("1000x1000")
 
         sex, weight, height, age, activity, fitness, carbohydrates, health = user_info
         nutrition_data = self.calculate_nutrition(sex, weight, height, age, activity, fitness, carbohydrates, health)
 
-        for key, value in nutrition_data.items():
-            CTK.CTkLabel(self.main_page, text = f"{key}: {value}").pack()
+        calories_intake, carbohydrates_intake, cholesterol_limit, fat_limit, protein_intake, sodium_limit, calcium_intake, iron_intake, potassium_intake, b12, b6a, c, d = user_info_fulfilled
 
-        CTK.CTkButton(self.main_page, text="Exit", command=self.on_close)
+        self.user_nutrition_information = ['Calories Intake: ', 'Carbohydrates Intake: ', 'Cholesterol Limit: ', 'Fat Limit: ', 'Protein Intake: ', 'Sodium Limit: ', 'Calcium Intake: ', 'Iron Intake: ', 'Potassium Intake: ', 'Vit B12 Intake: ', 'Vit B6A Intake: ', 'Vit C Intake: ', 'Vit D Intake: ']
+        self.user_nutriton_fulfilled = [calories_intake, carbohydrates_intake, cholesterol_limit, fat_limit, protein_intake, sodium_limit, calcium_intake, iron_intake, potassium_intake, b12, b6a, c, d]
+        self.user_nutrition_dailyneeds = [nutrition_data["caloric_intake"], 
+                                          nutrition_data["carbohydrates_intake"], 
+                                          nutrition_data["cholesterol_limit"], 
+                                          nutrition_data["fat_limit"], 
+                                          nutrition_data["protein_intake"], 
+                                          nutrition_data["sodium_limit"], 
+                                          nutrition_data["calcium_intake"],
+                                          nutrition_data["iron_intake"],
+                                          nutrition_data["potassium_intake"],
+                                          nutrition_data["vitamin_b12"],
+                                          nutrition_data["vitamin_b6a"],
+                                          nutrition_data["vitamin_c"],
+                                          nutrition_data["vitamin_d"]]
+        self.user_nutrition_measurements = ['kcal', 'g', 'mg', 'g', 'g', 'mg', 'mg', 'mg', 'mg', 'microgram', 'mg', 'mg', 'microgram']
+
+        self.table_in_mainpage = ttk.Treeview(self.main_page, columns=('Information', 'Fulfilled', 'Daily Needs', 'Measurements'), show='headings', height=14)
+        self.table_in_mainpage.heading('Information', text = 'Information')
+        self.table_in_mainpage.heading('Fulfilled', text = 'Fulfilled')
+        self.table_in_mainpage.heading('Daily Needs', text='Daily Needs')
+        self.table_in_mainpage.heading('Measurements', text='Measurements')
+        self.table_in_mainpage.pack(pady=5)
+
+        for i in range(13):
+            self.table_in_mainpage.insert(parent='', index=0, values=(self.user_nutrition_information[12-i], self.user_nutriton_fulfilled[12-i], self.user_nutrition_dailyneeds[12-i], self.user_nutrition_measurements[12-i]))
+
+        CTK.CTkButton(self.main_page, text="Exit", command=self.on_close).pack(pady=5)
 
     def calculate_nutrition(self, sex, weight, height, age, activity, fitness, carbohydrates, health):
         nutrition_data = nutrition(sex, weight, height, age, activity, fitness, carbohydrates, health)
         return nutrition_data
     
     def on_close(self):
-        self.db_manager.close()
         self.main_page.destroy()    
 
 class Database:
@@ -144,6 +175,24 @@ class Database:
             FOREIGN KEY (id) REFERENCES users (id))
         ''')
 
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_information_fulfilled (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            calories_intake INTEGER,
+            carbohydrates_intake INTEGER,
+            cholesterol_limit INTEGER,
+            fat_limit INTEGER,
+            protein_intake INTEGER,
+            sodium_limit INTEGER,
+            calcium_intake INTEGER,
+            iron_intake INTEGER,
+            potassium_intake INTEGER,
+            b12 INTEGER,
+            b6a INTEGER,
+            c INTEGER,
+            d INTEGER,
+            FOREIGN KEY (id) REFERENCES users (id))
+        ''')
         self.conn.commit()
 
     def get_user(self, username, password):
@@ -154,6 +203,13 @@ class Database:
         self.cursor.execute('''
             SELECT sex, weight, height, age, activity, fitness, carbohydrates, health
             FROM user_information WHERE id = ?
+        ''', (user_id,))
+        return self.cursor.fetchone()
+
+    def get_user_information_fulfilled(self, user_id):
+        self.cursor.execute('''
+            SELECT calories_intake, carbohydrates_intake, cholesterol_limit, fat_limit, protein_intake, sodium_limit, calcium_intake, iron_intake, potassium_intake, b12, b6a, c, d
+            FROM user_information_fulfilled WHERE id = ?
         ''', (user_id,))
         return self.cursor.fetchone()
 
@@ -170,7 +226,9 @@ class Database:
             INSERT INTO user_information (id, sex, weight, height, age, activity, fitness, carbohydrates, health)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (user_id, sex, weight, height, age, activity, fitness, carbohydrates, health))
-        self.conn.commit()
+        self.cursor.execute('''
+            INSERT INTO user_information_fulfilled (id, calories_intake, carbohydrates_intake, cholesterol_limit, fat_limit, protein_intake, sodium_limit, calcium_intake, iron_intake, potassium_intake, b12, b6a, c, d)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (user_id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
-db_manager = Database()
-app = LoginAndSignUp(db_manager)
+        self.conn.commit()

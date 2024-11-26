@@ -6,6 +6,7 @@ class API_edamame:
     API_KEY = "721dd245ca8f09664b5a301bcbd4a953"
 
     def parameters(self, food):
+        # Creating a response.
         params = {
         "app_id": API_edamame.APP_ID,
         "app_key": API_edamame.API_KEY,
@@ -47,7 +48,7 @@ class API_edamame:
 
         else:
             print(f"Error {response.status_code}, {response.text}")
-
+        
         return {
                 "calories_from_API": calories_amount["quantity"],
                 "carbohydrates_from_API": carbs_amount["quantity"],

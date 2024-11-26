@@ -5,7 +5,7 @@ class UserInputSignup:
     def __init__(self) -> None:
         CTK.set_appearance_mode("dark")
         CTK.set_default_color_theme("blue")
-        self.user_data = {}
+        self.user_data = {} # Storage for all data inputs in this module.
     
     def create_first_window(self):
         self.window1 = CTK.CTk()
@@ -18,7 +18,6 @@ class UserInputSignup:
         radio_frame = CTK.CTkFrame(self.window1)
         radio_frame.pack(pady=5)
 
-        # Radio buttons centered inside the frame
         self.sex_var = self.user_data.get("sex_var", CTK.StringVar())
         CTK.CTkRadioButton(radio_frame, text="Male", variable=self.sex_var, value="Male").pack(side="left", padx=10)
         CTK.CTkRadioButton(radio_frame, text="Female", variable=self.sex_var, value="Female").pack(side="left", padx=10)
@@ -56,17 +55,19 @@ class UserInputSignup:
         weight = self.weight_entry.get()
         height = self.height_entry.get()
         age = self.age_entry.get()
+        # User input checks, making sure data types are proper.
         try:
             weight = int(weight)
             height = int(height)
             age = int(age)
             if len(sex) != 0:
+                # Saves the variable.
                 self.user_data.update({
                     "sex": sex,
                     "weight": weight,
                     "height": height,
                     "age": age,
-                    "sex_var": self.sex_var  # Save the variable for later.
+                    "sex_var": self.sex_var 
                 })
                 self.create_second_window()
             else:
@@ -140,6 +141,7 @@ class UserInputSignup:
         fitness = self.fitness_var.get()
         carbohydrates = self.carbs_var.get()
         health = self.health_var.get()
+        # Checks for null radio button inputs.
         if len(activity) != 0 and len(fitness) != 0 and len(carbohydrates) != 0 and len(health) != 0:
             self.user_data.update({
                 "activity": activity,
@@ -153,7 +155,7 @@ class UserInputSignup:
             })
             self.confirmation_window()
         else:
-            CTK.CTkLabel(self.window2, text="Make sure to fill all of the questions!").pack(pady=10)
+            CTK.CTkLabel(self.window2, text="Make sure to fill all of the questions!").pack(pady=15)
 
     def confirmation_window(self):
         
@@ -161,9 +163,10 @@ class UserInputSignup:
 
         self.window_confirm = CTK.CTk()
         self.window_confirm.title("Data Confirmation")
-        self.window_confirm.geometry("400x500")
+        self.window_confirm.geometry("400x400")
 
         self.user_preferences = ['Sex: ', 'Weight: ', 'Height: ', 'Age: ', 'Activity Level: ', 'Fitness Goal: ', 'Carbohydrate Intake: ', 'Medical Problems: ']
+        # Retrieves all the data from self.user_data.
         self.user_preferences_details = [
             self.user_data.get('sex', 'N/A'),
             self.user_data.get('weight', 'N/A'),
@@ -177,11 +180,11 @@ class UserInputSignup:
 
         CTK.CTkLabel(self.window_confirm, text="Confirm Your Details:", font=("Arial", 16)).pack(pady=5)
 
-        self.table_information = ttk.Treeview(self.window_confirm, columns=('Information', 'Details'), show='headings')
+        # Data presented in table form.
+        self.table_information = ttk.Treeview(self.window_confirm, columns=('Information', 'Details'), show='headings', height=8)
         self.table_information.heading('Information', text='Information')
         self.table_information.heading('Details', text='Details')
         self.table_information.pack(pady=0)
-
         for i in range(8):
             self.table_information.insert(parent='', index=0, values=(self.user_preferences[7-i], self.user_preferences_details[7-i]))
 
@@ -200,14 +203,16 @@ class UserInputSignup:
                       command=self.go_back_to_front).pack(pady=20)
         
     def go_back_to_front(self):
+        # Returns back to the beginning page.
         self.window_confirm.destroy()
         self.create_first_window()
 
     def save_information(self):
+        # Data is successfully saved.
         self.window_confirm.destroy()
         self.save_window = CTK.CTk()
         self.save_window.title("Yay! Welcome.")
-        self.save_window.geometry("400x400")
+        self.save_window.geometry("400x50")
         CTK.CTkLabel(self.save_window, text="Your data has been saved! Close and restart the app.").pack(pady=5)
         return self.user_data
 

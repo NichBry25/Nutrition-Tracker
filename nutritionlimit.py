@@ -1,3 +1,5 @@
+# This function takes in 8 arguments given by the signup.py module and is going to return the user's needed daily nutrition!
+
 def nutrition(sex, weight_kg, height_cm, age, activity_level, fitness_goal, carb_intake, health_condition):
     # Caloric intake.
     if sex == "Male":

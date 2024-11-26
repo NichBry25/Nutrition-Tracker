@@ -4,6 +4,7 @@ from signup import UserInputSignup
 from tkinter import ttk
 from nutritionlimit import nutrition
 from api import API_edamame
+from datetime import date
 
 class LoginAndSignUp:
     def __init__(self, db_manager) -> None:
@@ -182,7 +183,7 @@ class LoginAndSignUp:
                         try:
                             value = float(value) if value != '' else 0.0
                         except ValueError:
-                            value = 1.0  # Default to 0.0 if conversion fails
+                            value = 1.0  # Default to 1.0 if conversion fails
 
                 # Add the numeric value to the total
                     if isinstance(value, (int, float)):
@@ -236,14 +237,17 @@ class LoginAndSignUp:
 
     def on_close(self):
         self.main_page.destroy()    
+        self.db_manager.conn.close()
 
 class Database:
     def __init__(self, db_name = "user_data.db") -> None:
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
         self.create_tables()
+        self.check_for_date()
 
     def create_tables(self):
+        # Creates table for ever user's data information.
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -251,6 +255,7 @@ class Database:
             password TEXT NOT NULL)
         ''')
 
+        # Creates table to specify nutrients needed everyday.
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_information (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -265,6 +270,7 @@ class Database:
             FOREIGN KEY (id) REFERENCES users (id))
         ''')
 
+        # Creates table to specify nutrients that has been fulfilled in a day.
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_information_fulfilled (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -283,7 +289,45 @@ class Database:
             d INTEGER,
             FOREIGN KEY (id) REFERENCES users (id))
         ''')
+
+        # Creates table to track login.
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_log (
+            date_login TEXT PRIMARY KEY)
+        ''')
+
         self.conn.commit()
+
+    def check_for_date(self):
+        current_date = str(date.today())
+
+        self.cursor.execute('SELECT date_login FROM user_log LIMIT 1')
+        last_stored_date = self.cursor.fetchone()
+
+        if last_stored_date is None or last_stored_date[0] != current_date:
+            # Reset the data in user_information_fulfilled to 0
+            self.cursor.execute('''
+            UPDATE user_information_fulfilled
+            SET calories_intake = 0,
+                carbohydrates_intake = 0, 
+                cholesterol_limit = 0, 
+                fat_limit = 0, 
+                protein_intake = 0, 
+                sodium_limit = 0, 
+                calcium_intake = 0, 
+                iron_intake = 0, 
+                potassium_intake = 0, 
+                b12 = 0, 
+                b6a = 0, 
+                c = 0, 
+                d = 0
+            ''')
+            self.conn.commit()
+    
+            self.cursor.execute('DELETE FROM user_log')
+            self.cursor.execute('INSERT INTO user_log (date_login) VALUES (?)', (current_date,))
+
+            self.conn.commit()
 
     def get_user(self, username, password):
         self.cursor.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, password))

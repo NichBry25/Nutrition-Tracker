@@ -1,5 +1,4 @@
 import requests
-import json
 
 class API_edamame:
     API_URL = "https://api.edamam.com/api/nutrition-data"
@@ -64,7 +63,3 @@ class API_edamame:
                 "vitc_from_API": vitC_amount["quantity"],
                 "vitd_from_API": vitD_amount["quantity"]
             }
-
-# food_data = API_edamame()
-# hi = food_data.nutritional_data("100 grams of salmon")
-# print(hi)

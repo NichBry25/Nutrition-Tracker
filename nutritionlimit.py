@@ -1,5 +1,3 @@
-from signup import UserInputSignup
-
 def nutrition(sex, weight_kg, height_cm, age, activity_level, fitness_goal, carb_intake, health_condition):
     # Caloric intake.
     if sex == "Male":

@@ -270,7 +270,7 @@ class Database:
         # Creates table to specify nutrients needed everyday. If it already exist, it won't recreate it.
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_information (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             sex TEXT,
             weight INTEGER,
             height INTEGER,
@@ -285,7 +285,7 @@ class Database:
         # Creates table to specify nutrients that has been fulfilled in a day. If it already exist, it won't recreate it.
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_information_fulfilled (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             calories_intake INTEGER,
             carbohydrates_intake INTEGER,
             cholesterol_limit INTEGER,

@@ -2,8 +2,8 @@ import requests
 
 class API_edamame:
     API_URL = "https://api.edamam.com/api/nutrition-data"
-    APP_ID = "03646183"
-    API_KEY = "721dd245ca8f09664b5a301bcbd4a953"
+    APP_ID = "YOUR_APP_ID"
+    API_KEY = "YOUR_API_KEY"
 
     def parameters(self, food):
         # Creating a response.

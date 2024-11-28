@@ -1,7 +1,7 @@
-from mainpage import LoginAndSignUp, Database
+from mainpage import Application, Database
 
 # Initializing the running program.
 if __name__ == "__main__":
     db_manager = Database()
-    app = LoginAndSignUp(db_manager)
+    app = Application(db_manager)
     

@@ -6,7 +6,7 @@ from nutritionlimit import nutrition
 from api import API_edamame
 from datetime import date
 
-class LoginAndSignUp:
+class Application:
     def __init__(self, db_manager) -> None:
         self.db_manager = db_manager # Takes in the initialized instance of the database class.
         self.gettingdata = UserInputSignup() # Initializs the UserInputSignup class from signup.py inside.

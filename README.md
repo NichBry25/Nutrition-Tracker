@@ -8,6 +8,7 @@ Installations Required:
    https://pypi.org/project/customtkinter/
 3. Tkinter
    https://www.tutorialspoint.com/how-to-install-tkinter-in-python
+
 Note: Always install the latest version of the modules.
 
 API Required:

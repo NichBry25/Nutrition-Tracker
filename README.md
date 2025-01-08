@@ -18,7 +18,7 @@ API Required:
 How to Run the Code:
 1. Download the code from the repository.
 2. Run the program on the _main.py_ file.
-3. Optional: To examine the database, install a DB reader.
+3. Optional: To examine the database, install a DB reader for SQLite.
 
     
    
